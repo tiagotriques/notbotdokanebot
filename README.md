@@ -2,7 +2,7 @@
 
 Um bot tosco com piadas internas toscas. Não deve ser levado a sério.
 
-Fala com ele, [@botdokanebot](http://t.me/botdokanebot) no Telegram.
+Fala com ele, [@notbotdokanebot](http://t.me/notbotdokanebot) no Telegram.
 
 APIs Utilizadas em Comandos
 -------
