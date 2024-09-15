@@ -1,13 +1,14 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from sys import argv, stdout
+from telegram.ext import Updater, CommandHandler
+from sys import argv
 import requests
 import logging
 import praw
 import random as rd
 from time import time, strftime, gmtime
 
-import auth # Telegram Bot Token
+import auth  # Telegram Bot Token
 from utils import *
+
 
 def start(update, context):
     logMessageReceived(update, context, logger)
@@ -16,6 +17,7 @@ def start(update, context):
     update.message.reply_text(s, parse_mode="Markdown")
     logMessageSent(update, context, logger, "TXT", s)
 
+
 def help(update, context):
     logMessageReceived(update, context, logger)
 
@@ -23,12 +25,13 @@ def help(update, context):
         "pra ver os comando digita / no chat e ve qq aparece ali\n",
         "\n",
         "vamo ajuda a faze o bot kkkkk\n",
-        "https://github.com/gabekanegae/botdokanebot/\n"
-        ]
+        "https://github.com/tiagotriques/notbotdokanebot/\n"
+    ]
 
     s = "".join(h)
     update.message.reply_text(s, parse_mode="Markdown")
     logMessageSent(update, context, logger, "TXT", s)
+
 
 def _getRandomFromFile(update, context, file):
     logMessageReceived(update, context, logger)
@@ -46,6 +49,7 @@ def _getRandomFromFile(update, context, file):
     logMessageSent(update, context, logger, "TXT", s)
     logger.info("    --> {} tries | Mem size: {}".format(tries, len(memory)))
 
+
 def bcc(update, context): _getRandomFromFile(update, context, bccList)
 def bbc(update, context): _getRandomFromFile(update, context, bbcList)
 def icmc(update, context): _getRandomFromFile(update, context, icmcList)
@@ -53,15 +57,16 @@ def usp(update, context): _getRandomFromFile(update, context, uspList)
 def becd(update, context): _getRandomFromFile(update, context, becdList)
 def bsi(update, context): _getRandomFromFile(update, context, bsiList)
 
+
 def filme(update, context):
     logMessageReceived(update, context, logger)
 
     now = int(time())
     s = None
     tries = 0
-    while ((s == None) or (s in memory and now-memory[s] < MEMORY_TIMEOUT)) and (tries < MAX_TRIES):
+    while ((s is None) or (s in memory and now-memory[s] < MEMORY_TIMEOUT)) and (tries < MAX_TRIES):
         tries += 1
-    
+
         rPalavras = rd.randint(0, len(palavrasM) + len(palavrasF) - 1)
         pick = rd.choice(filmeList)
 
@@ -72,10 +77,11 @@ def filme(update, context):
             s = parseGender(pick, "female").format(word=palavrasF[rPalavras])
 
     memory[s] = now
-    
+
     update.message.reply_text(s, parse_mode="Markdown")
     logMessageSent(update, context, logger, "TXT", s)
     logger.info("    --> {} tries | Mem size: {}".format(tries, len(memory)))
+
 
 def fwd(update, context):
     logMessageReceived(update, context, logger)
@@ -88,19 +94,46 @@ def fwd(update, context):
             tries += 1
             s = "fwd#" + str(messageID)
             if s not in memory or now-memory[s] >= MEMORY_TIMEOUT or tries >= MAX_TRIES:
-                context.bot.forwardMessage(update.effective_chat.id, "@ofwdnovo", messageID)
-                
+                context.bot.forwardMessage(
+                    update.effective_chat.id, "@ofwdnovo", messageID)
+
                 memory[s] = now
                 break
-        except:
+        except Exception:
             pass
 
-    logMessageSent(update, context, logger, "FWD", str(messageID), origID=messageID, origChannel="@ofwdnovo")
+    logMessageSent(update, context, logger, "FWD", str(
+        messageID), origID=messageID, origChannel="@ofwdnovo")
     logger.info("    --> {} tries | Mem size: {}".format(tries, len(memory)))
+
+
+def cu(update, context):
+    logMessageReceived(update, context, logger)
+
+    now = int(time())
+    tries = 0
+    while True:
+        messageID = rd.randint(0, MAX_FWD_CU_ID)
+        try:
+            tries += 1
+            s = "fwd#" + str(messageID)
+            if s not in memory or now-memory[s] >= MEMORY_TIMEOUT or tries >= MAX_TRIES:
+                context.bot.forwardMessage(
+                    update.effective_chat.id, "@fwdcu", messageID)
+
+                memory[s] = now
+                break
+        except Exception:
+            pass
+
+    logMessageSent(update, context, logger, "FWD", str(
+        messageID), origID=messageID, origChannel="@fwdcu")
+    logger.info("    --> {} tries | Mem size: {}".format(tries, len(memory)))
+
 
 def joegs(update, context):
     logMessageReceived(update, context, logger)
-    
+
     origMsg = update.message.reply_to_message
 
     queryText = None
@@ -119,11 +152,12 @@ def joegs(update, context):
                 s = "hmmm acho q eh vdd"
             else:
                 s = "sei nao hein, se pa eh fake"
-        except:
+        except Exception:
             s = "caraio o joegs fudeu o role, alguem chama ele"
 
     update.message.reply_text(s, parse_mode="Markdown")
     logMessageSent(update, context, logger, "TXT", s)
+
 
 def zapzap(update, context):
     logMessageReceived(update, context, logger)
@@ -141,11 +175,16 @@ def zapzap(update, context):
         if len(context.args) != 0:
             userMood = context.args[0].lower()
 
-            if userMood in moodAngry: mood = "angry"
-            elif userMood in moodHappy: mood = "happy"
-            elif userMood in moodSad: mood = "sad"
-            elif userMood in moodSassy: mood = "sassy"
-            elif userMood in moodSick: mood = "sick"
+            if userMood in moodAngry:
+                mood = "angry"
+            elif userMood in moodHappy:
+                mood = "happy"
+            elif userMood in moodSad:
+                mood = "sad"
+            elif userMood in moodSassy:
+                mood = "sassy"
+            elif userMood in moodSick:
+                mood = "sick"
 
         origMsgWords = len(origMsg.text.split())
         if origMsgWords <= 5:
@@ -155,17 +194,20 @@ def zapzap(update, context):
         else:
             rate = "0.6"
 
-        body = {"zap": queryText, "mood": mood, "strength": "3", "rate": rate, "tweet": "false"}
+        body = {"zap": queryText, "mood": mood,
+                "strength": "3", "rate": rate, "tweet": "false"}
 
         try:
             r = requests.post(url=FLIPPER_URL, data=body).json()
 
-            if r["zap"]: s = r["zap"]
-        except:
+            if r["zap"]:
+                s = r["zap"]
+        except Exception:
             s = "puta merda chama o flipper que deu ruim aqui"
 
     update.message.reply_text(s, parse_mode="Markdown")
     logMessageSent(update, context, logger, "TXT", s)
+
 
 def _getRandomFromReddit(update, context, subreddit, user=None):
     logMessageReceived(update, context, logger)
@@ -176,22 +218,35 @@ def _getRandomFromReddit(update, context, subreddit, user=None):
         try:
             tries += 1
             imgDesc, imgUrl = getRandomImageReddit(reddit, subreddit, user)
-            
+
             s = subreddit + "#" + imgUrl
             if imgUrl and (s not in memory or now-memory[s] >= MEMORY_TIMEOUT or tries >= MAX_TRIES):
                 memory[s] = now
                 break
-        except:
+        except Exception:
             pass
 
-    context.bot.send_photo(chat_id=update.effective_chat.id, photo=imgUrl, caption=imgDesc)
+    context.bot.send_photo(chat_id=update.effective_chat.id,
+                           photo=imgUrl, caption=imgDesc)
     logMessageSent(update, context, logger, "IMG", imgDesc, url=imgUrl)
     logger.info("    --> {} tries | Mem size: {}".format(tries, len(memory)))
 
-def foodporn(update, context): _getRandomFromReddit(update, context, "foodporn")
-def shittyfoodporn(update, context): _getRandomFromReddit(update, context, "shittyfoodporn")
-def superaww(update, context): _getRandomFromReddit(update, context, "superaww", "316nuts")
-def programmerhumor(update, context): _getRandomFromReddit(update, context, "programmerhumor")
+
+def foodporn(update, context): _getRandomFromReddit(
+    update, context, "foodporn")
+
+
+def shittyfoodporn(update, context): _getRandomFromReddit(
+    update, context, "shittyfoodporn")
+
+
+def superaww(update, context): _getRandomFromReddit(
+    update, context, "superaww", "316nuts")
+
+
+def programmerhumor(update, context): _getRandomFromReddit(
+    update, context, "programmerhumor")
+
 
 def bandeco(update, context):
     logMessageReceived(update, context, logger)
@@ -200,10 +255,13 @@ def bandeco(update, context):
     pick = rd.choice(combos)
 
     context.bot.forwardMessage(update.effective_chat.id, "@ofwdnovo", pick[0])
-    logMessageSent(update, context, logger, "FWD", str(pick[0]), origID=pick[0], origChannel="@ofwdnovo")
+    logMessageSent(update, context, logger, "FWD", str(
+        pick[0]), origID=pick[0], origChannel="@ofwdnovo")
 
     context.bot.forwardMessage(update.effective_chat.id, "@ofwdnovo", pick[1])
-    logMessageSent(update, context, logger, "FWD", str(pick[1]), origID=pick[1], origChannel="@ofwdnovo")
+    logMessageSent(update, context, logger, "FWD", str(
+        pick[1]), origID=pick[1], origChannel="@ofwdnovo")
+
 
 def toschi(update, context):
     logMessageReceived(update, context, logger)
@@ -216,14 +274,17 @@ def toschi(update, context):
         return
 
     context.bot.forwardMessage(update.effective_chat.id, "@ofwdnovo", 362)
-    logMessageSent(update, context, logger, "FWD", "362", origID=362, origChannel="@ofwdnovo")
+    logMessageSent(update, context, logger, "FWD", "362",
+                   origID=362, origChannel="@ofwdnovo")
 
     context.bot.forwardMessage(update.effective_chat.id, "@ofwdnovo", 363)
-    logMessageSent(update, context, logger, "FWD", "363", origID=363, origChannel="@ofwdnovo")
+    logMessageSent(update, context, logger, "FWD", "363",
+                   origID=363, origChannel="@ofwdnovo")
+
 
 def proximo(update, context, option=None):
     logMessageReceived(update, context, logger)
-    
+
     m, d, A, H = strftime("%m %d %A %H", gmtime(time()-3*60*60)).split()
     H = int(H)
     weekdays = {"Monday": "Segunda", "Tuesday": "Terça",
@@ -236,7 +297,8 @@ def proximo(update, context, option=None):
             mealTime = "☀ Almoço"
         elif H >= 19:
             mealTime = "☀ Almoço"
-            m, d, A, H = strftime("%m %d %A %H", gmtime(time()-3*60*60+5*60*60)).split()
+            m, d, A, H = strftime("%m %d %A %H", gmtime(
+                time()-3*60*60+5*60*60)).split()
             H = int(H)
         else:
             mealTime = "🌙 Jantar"
@@ -244,7 +306,7 @@ def proximo(update, context, option=None):
         mealTime = "☀ Almoço"
     else:
         mealTime = "🌙 Jantar"
-    
+
     weekday = weekdays[A]
     day = d + "/" + m
 
@@ -282,14 +344,17 @@ def proximo(update, context, option=None):
     s += "Opção Vegetariana: {}/\n{}/\nSobremesa: {}\n{}/\n"
     s += "{}\n{}\n\n_Valor energético médio: ⚡ {}Kcal_"
 
-    s = s.format(mealTime, weekday, day, salada, carne, veg, mistura, doce, fruta, pao, bebida, calories)
+    s = s.format(mealTime, weekday, day, salada, carne, veg,
+                 mistura, doce, fruta, pao, bebida, calories)
 
     memory[mealKey] = s
     update.message.reply_text(s, parse_mode="Markdown")
     logMessageSent(update, context, logger, "TXT", s)
 
+
 def almoco(update, context): proximo(update, context, "almoco")
 def jantar(update, context): proximo(update, context, "jantar")
+
 
 def _sendSimpleText(update, context, text):
     logMessageReceived(update, context, logger)
@@ -297,8 +362,10 @@ def _sendSimpleText(update, context, text):
     update.message.reply_text(text, parse_mode="Markdown")
     logMessageSent(update, context, logger, "TXT", text)
 
+
 def matricula(update, context):
     _sendSimpleText(update, context, "mais um semestre nao pfv n aguento mais")
+
 
 def main():
     updater = Updater(token=TOKEN, use_context=True)
@@ -314,6 +381,7 @@ def main():
     dp.add_handler(CommandHandler("icmc", icmc))
     dp.add_handler(CommandHandler("usp", usp))
     dp.add_handler(CommandHandler("fwd", fwd))
+    dp.add_handler(CommandHandler("cu", cu))
     dp.add_handler(CommandHandler("joegs", joegs))
     dp.add_handler(CommandHandler("zapzap", zapzap))
     dp.add_handler(CommandHandler("comtompero", foodporn))
@@ -332,13 +400,14 @@ def main():
 
     updater.idle()
 
+
 if __name__ == "__main__":
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s",
                         handlers=[logging.FileHandler("bot.log", "a", "UTF-8"), logging.StreamHandler()])
 
     JOEGS_URL = "http://nilc-fakenews.herokuapp.com/ajax/check/"
-    FLIPPER_URL = "http://vemdezapbebe.herokuapp.com/api/v1.0/zap/"
+    FLIPPER_URL = "http://zapzap/api/v1.0/zap/"  # Docker compose
 
     bccList = loadFile("bcc.txt")
     bbcList = loadFile("bbc.txt")
@@ -365,10 +434,11 @@ if __name__ == "__main__":
     moodSassy = set(["sassy", "tarado", "safado"] + list(emojiSassy))
     moodSick = set(["sick", "doente"] + list(emojiSick))
 
-    MEMORY_TIMEOUT = 5*60 # Doesn't repeat messages shown within the last X seconds
-    MAX_FWD_ID = 1500 # FWD channel has less than X messages
-    MAX_TRIES = 100 # Will try showing an unique message X times before giving up
-    
+    MEMORY_TIMEOUT = 5*60  # Doesn't repeat messages shown within the last X seconds
+    MAX_FWD_ID = 1500  # FWD channel has less than X messages
+    MAX_FWD_CU_ID = 50  # FWD channel has less than X messages
+    MAX_TRIES = 100  # Will try showing an unique message X times before giving up
+
     reddit = praw.Reddit(client_id=auth.REDDIT_CID,
                          client_secret=auth.REDDIT_CSECRET,
                          user_agent=auth.REDDIT_UA)
