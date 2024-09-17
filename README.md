@@ -1,4 +1,4 @@
-# botdokanebot
+# botdokanebot reborn
 
 Um bot tosco com piadas internas toscas. Não deve ser levado a sério.
 
