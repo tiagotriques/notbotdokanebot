@@ -343,9 +343,6 @@ def proximo(update, context, option=None):
     s += "Arroz/Feijão/Arroz Integral/\n{}/\n{}\n"
     s += "Opção Vegetariana: {}/\n{}/\nSobremesa: {}\n{}/\n"
     s += "{}\n{}\n\n_Valor energético médio: ⚡ {}Kcal_"
-
-    s = s.format(mealTime, weekday, day, salada, carne, veg,
-                 mistura, doce, fruta, pao, bebida, calories)
     
     if option == "chuchu":
         s = s.format(mealTime, weekday, day, "Chuchu cozido", "Bife de chuchu",
@@ -354,6 +351,8 @@ def proximo(update, context, option=None):
                      "Miolo de pão ao chuchu", "Suco de Limão que parece Tamarindo e tem gosto de Chuchu",
                      calories)
     else:
+        s = s.format(mealTime, weekday, day, salada, carne, veg, 
+                     mistura, doce, fruta, pao, bebida, calories)
         memory[mealKey] = s
     
     update.message.reply_text(s, parse_mode="Markdown")
