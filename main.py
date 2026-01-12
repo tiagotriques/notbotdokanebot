@@ -292,7 +292,7 @@ def proximo(update, context, option=None):
                 "Friday": "Sexta", "Saturday": "Sábado",
                 "Sunday": "Domingo"}
 
-    if not option:
+    if not option or option == "chuchu":
         if H <= 13:
             mealTime = "☀ Almoço"
         elif H >= 19:
@@ -346,14 +346,23 @@ def proximo(update, context, option=None):
 
     s = s.format(mealTime, weekday, day, salada, carne, veg,
                  mistura, doce, fruta, pao, bebida, calories)
+    
+    if option == "chuchu":
+        s = s.format(mealTime, weekday, day, "Chuchu cozido", "Bife de chuchu",
+                     "Chuchu", "Folha de chuchu", "Chuchu em conserva",
+                     "Morango com gosto de chuchu do mercadão de São Paulo",
+                     "Miolo de pão ao chuchu", "Suco de Limão que parece Tamarindo e tem gosto de Chuchu",
+                     calories)
 
     memory[mealKey] = s
     update.message.reply_text(s, parse_mode="Markdown")
     logMessageSent(update, context, logger, "TXT", s)
 
-
 def almoco(update, context): proximo(update, context, "almoco")
 def jantar(update, context): proximo(update, context, "jantar")
+def chuchu(update, context): proximo(update, context, "chuchu")
+
+
 
 
 def _sendSimpleText(update, context, text):
@@ -394,6 +403,7 @@ def main():
     dp.add_handler(CommandHandler("bandeco", bandeco))
     dp.add_handler(CommandHandler("toschi", toschi))
     dp.add_handler(CommandHandler("matricula", matricula))
+    dp.add_handler(CommandHandler("chuchu", chuchu))
 
     updater.start_polling()
     logging.info("=== Bot running! ===")
